@@ -1,0 +1,26 @@
+<inventory>
+  <item>
+    <pid>1</pid>
+    <name>T-Shirt (Large)</name>
+    <price>19.99</price>
+    <quantity>20</quantity>
+  </item>
+  <item>
+    <pid>2</pid>
+    <name>Coffee Mug</name>
+    <price>8.50</price>
+    <quantity>15</quantity>
+  </item>
+  <item>
+    <pid>3</pid>
+    <name>Notebook (Lined)</name>
+    <price>4.99</price>
+    <quantity>35</quantity>
+  </item>
+  <item>
+    <pid>30</pid>
+    <name>Phone Case (Blue)</name>
+    <price>14.95</price>
+    <quantity>12</quantity>
+  </item>
+</inventory>
