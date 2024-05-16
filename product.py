@@ -230,27 +230,28 @@ class productClass:
 
 
     def delete(self):
-        con=sqlite3.connect(database=r'ims.db')
-        cur=con.cursor()
+        con = sqlite3.connect(database=r'ims.db')
+        cur = con.cursor()
         try:
-            if self.var_pid.get()=="": #or self.var_name.get()==:
-                messagebox.showerror("Error","Product ID is required", parent=self.root)
+            if self.var_pid.get() == "": # Check if the Product ID is provided
+                messagebox.showerror("Error", "Product ID is required", parent=self.root)
             else:
-                cur.execute("select * from product where pid=?",(self.var_pid.get(),))
-                row=cur.fetchone()
-                if row==None:
+                cur.execute("SELECT * FROM product WHERE pid=?", (self.var_pid.get(),))
+                row = cur.fetchone()
+                if row is None:
                     messagebox.showerror("Error", "Invalid Product ID", parent=self.root)
                 else:
-                    op=messagebox.askyesno("Confirm", "Do you want to delete this product?", parent=self.root)
-                    if op==True:
-                        cur.execute("delete from product where pid=?",self.var_pid.get())
+                    op = messagebox.askyesno("Confirm", "Do you want to delete this product?", parent=self.root)
+                    if op:
+                        cur.execute("DELETE FROM product WHERE pid=?", (self.var_pid.get(),))
                         con.commit()
                         self.clear()
-                        messagebox.showinfo("Delete","Product deleted successfully", parent=self.root)
-
-        
+                        messagebox.showinfo("Delete", "Product deleted successfully", parent=self.root)
         except Exception as ex:
-            messagebox.showerror("Error",f"Error due to: {str(ex)}", parent=self.root)
+            messagebox.showerror("Error", f"Error due to: {str(ex)}", parent=self.root)
+        finally:
+            con.close()
+
 
 
     def clear(self):
@@ -261,9 +262,9 @@ class productClass:
         self.var_quantity.set("")
         self.var_status.set("Active")
         self.var_pid.set("") 
-        self.var_searchtxt.set("")
-        self.var_searchby.set("Select")
-        self.var_pid.set("")
+        #self.var_searchtxt.set("")
+        #self.var_searchby.set("Select")
+        #self.var_pid.set("")
         self.show()
 
     def search(self):

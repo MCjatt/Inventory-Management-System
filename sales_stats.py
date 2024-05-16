@@ -39,6 +39,7 @@ class sales_statsClass:
         txt_search.place(x=660,y=10, width=250)
 
         btn_search=Button(searchFrame, text="Search",command=self.filter, font=("goudy old style",15),bg="#3ec141", cursor="hand2").place(x=920,y=10,width=170,height=30)
+        btn_clear=Button(searchFrame, text="Clear",command=self.show, font=("goudy old style",15),bg="#feff97", cursor="hand2").place(x=1100,y=10,width=170,height=30)
 
         SoldFrame=Frame(self.root, bd=3, bg="#8aa892")
         SoldFrame.place(x= 50, y=160, width=1420, height=700)
