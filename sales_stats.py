@@ -4,6 +4,9 @@ import sqlite3
 import time
 import datetime
 from datetime import datetime, timedelta
+from tkinter import filedialog
+from reportlab.lib.pagesizes import A4
+from reportlab.pdfgen import canvas
 
 
 class sales_statsClass:
@@ -38,8 +41,14 @@ class sales_statsClass:
         txt_search=Entry(searchFrame, textvariable=self.var_searchtxt, font=("goudy old style",15),bg="light yellow")
         txt_search.place(x=660,y=10, width=250)
 
-        btn_search=Button(searchFrame, text="Search",command=self.filter, font=("goudy old style",15),bg="#3ec141", cursor="hand2").place(x=920,y=10,width=170,height=30)
-        btn_clear=Button(searchFrame, text="Clear",command=self.show, font=("goudy old style",15),bg="#feff97", cursor="hand2").place(x=1100,y=10,width=170,height=30)
+        btn_search=Button(searchFrame, text="Search",command=self.filter, font=("goudy old style",15),bg="#3ec141", cursor="hand2").place(x=920,y=10,width=90,height=30)
+        btn_clear=Button(searchFrame, text="Clear",command=self.show, font=("goudy old style",15),bg="#feff97", cursor="hand2").place(x=1020,y=10,width=90,height=30)
+
+        lbl_print_report=Label(searchFrame, text="Export:", font=("Goudy old style", 15), bg="#8aa892").place(x=1120,y=10)
+        btn_pdf=Button(searchFrame, text="PDF", command=self.export, font=("goudy old style",15),bg="#3ec141", cursor="hand2").place(x=1200,y=10,width=90,height=30)
+        btn_xml=Button(searchFrame, text="XML",command=self.export, font=("goudy old style",15),bg="#feff97", cursor="hand2").place(x=1300,y=10,width=90,height=30)
+
+
 
         SoldFrame=Frame(self.root, bd=3, bg="#8aa892")
         SoldFrame.place(x= 50, y=160, width=1420, height=700)
@@ -190,16 +199,16 @@ class sales_statsClass:
 
     def apply_time_filter(self, rows):
         today = datetime.now()
-        filtered_rows = []
+        self.filtered_rows = []
 
         if self.var_time.get() == "Today":
             today_date = today.strftime('%Y-%m-%d')
-            filtered_rows = [row for row in rows if row[6][:10] == today_date]
+            self.filtered_rows = [row for row in rows if row[6][:10] == today_date]
 
         elif self.var_time.get() == "This week":
             start_of_week = today - timedelta(days=today.weekday())
             end_of_week = start_of_week + timedelta(days=6)
-            filtered_rows = [row for row in rows if start_of_week.strftime('%Y-%m-%d') <= row[6][:10] <= end_of_week.strftime('%Y-%m-%d')]
+            self.filtered_rows = [row for row in rows if start_of_week.strftime('%Y-%m-%d') <= row[6][:10] <= end_of_week.strftime('%Y-%m-%d')]
 
         elif self.var_time.get() == "This month":
             start_of_month = today.replace(day=1)
@@ -207,14 +216,14 @@ class sales_statsClass:
                 end_of_month = today.replace(month=1, year=today.year+1, day=1) - timedelta(days=1)
             else:
                 end_of_month = today.replace(month=today.month+1, day=1) - timedelta(days=1)
-            filtered_rows = [row for row in rows if start_of_month.strftime('%Y-%m-%d') <= row[6][:10] <= end_of_month.strftime('%Y-%m-%d')]
+            self.filtered_rows = [row for row in rows if start_of_month.strftime('%Y-%m-%d') <= row[6][:10] <= end_of_month.strftime('%Y-%m-%d')]
 
         elif self.var_time.get() == "This year":
             start_of_year = today.replace(month=1, day=1)
             end_of_year = today.replace(month=12, day=31)
-            filtered_rows = [row for row in rows if start_of_year.strftime('%Y-%m-%d') <= row[6][:10] <= end_of_year.strftime('%Y-%m-%d')]
+            self.filtered_rows = [row for row in rows if start_of_year.strftime('%Y-%m-%d') <= row[6][:10] <= end_of_year.strftime('%Y-%m-%d')]
 
-        return filtered_rows
+        return self.filtered_rows
 
     def apply_sort_filter(self, rows):
         if self.var_sort.get() == "Most Sold":
@@ -222,6 +231,85 @@ class sales_statsClass:
         elif self.var_sort.get() == "Least Sold":
             rows.sort(key=lambda x: int(x[3]))
         return rows
+    
+
+    def export(self):
+        # Step 1: Retrieve data from SalesTable
+        print(self.filtered_rows)
+        if len(self.filtered_rows) != 0:
+            # Step 2: Format the report
+            header = f"{'ID':<20} {'Product':<25} {'Category':<15} {'Qty':<5} {'Total':<10} {'Supplier':<15} {'Date':<25}\n"
+            header += "-" * 280 + "\n"
+            body = ""
+            for row in self.filtered_rows:
+                body += f"{row[0]:<20} {row[1]:<25} {row[2]:<15} {row[3]:<5} {row[4]:<10} {row[5]:<15} {row[6]:<25}\n"
+
+            footer = "\n" + "-" * 280 + "\n"
+            footer += f"Total Sales: {len(self.filtered_rows):<10}"
+            income=0.0
+            for total in self.filtered_rows:
+                income=income+float(total[4])
+            footer += f"Total Income: €{str(income):<20}"
+            footer += f"Generated on: {datetime.now().strftime('%Y-%m-%d %H:%M:%S'):<20}"
+
+            report_content = header + body + footer
+
+            # Step 3: Save the report as PDF
+            file_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")], title="Save Report As")
+            if file_path:
+                c = canvas.Canvas(file_path, pagesize=A4)
+                width, height = A4
+
+                # Add title
+                c.setFont("Helvetica-Bold", 16)
+                c.drawString(30, height - 50, "Sales Report")
+
+                # Add header
+                c.setFont("Courier", 8)
+                text_object = c.beginText(30, height - 70)
+                for line in header.split("\n"):
+                    text_object.textLine(line)
+                c.drawText(text_object)
+
+                # Calculate available space for body and footer
+                available_space = height - 150  # Leave some space for title and header
+                footer_height = 50  # Assume a fixed height for footer
+                max_body_lines = (available_space - footer_height) // 12  # Assuming font size 10
+
+                # Add body
+                lines_added = 0
+                text_object = c.beginText(30, height - 100)
+                for line in body.split("\n"):
+                    if lines_added < max_body_lines:
+                        text_object.textLine(line)
+                        lines_added += 1
+                    else:
+                        c.drawText(text_object)
+                        c.showPage()
+                        c.setFont("Courier", 10)
+                        text_object = c.beginText(30, height - 70)
+                        for line in header.split("\n"):
+                            text_object.textLine(line)  # Add header on each new page
+                        text_object.textLine(line)
+                        lines_added = 1  # Reset line counter
+                c.drawText(text_object)
+
+                # Add footer
+                c.setFont("Courier", 10)
+                text_object = c.beginText(30, 30)
+                for line in footer.split("\n"):
+                    text_object.textLine(line)
+                c.drawText(text_object)
+
+                c.showPage()
+                c.save()
+                messagebox.showinfo("Success", "Sales report has been saved as sales_report.pdf")
+
+                
+
+        
+
+        messagebox.showinfo("Success", f"Sales report saved successfully at {file_path}")
 
 
         
