@@ -7,6 +7,7 @@ from datetime import datetime, timedelta
 from tkinter import filedialog
 from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas
+import xml.etree.ElementTree as ET
 
 
 class sales_statsClass:
@@ -45,8 +46,8 @@ class sales_statsClass:
         btn_clear=Button(searchFrame, text="Clear",command=self.show, font=("goudy old style",15),bg="#feff97", cursor="hand2").place(x=1020,y=10,width=90,height=30)
 
         lbl_print_report=Label(searchFrame, text="Export:", font=("Goudy old style", 15), bg="#8aa892").place(x=1120,y=10)
-        btn_pdf=Button(searchFrame, text="PDF", command=self.export, font=("goudy old style",15),bg="#3ec141", cursor="hand2").place(x=1200,y=10,width=90,height=30)
-        btn_xml=Button(searchFrame, text="XML",command=self.export, font=("goudy old style",15),bg="#feff97", cursor="hand2").place(x=1300,y=10,width=90,height=30)
+        btn_pdf=Button(searchFrame, text="PDF", command=self.exportpdf, font=("goudy old style",15),bg="#3ec141", cursor="hand2").place(x=1200,y=10,width=90,height=30)
+        btn_xml=Button(searchFrame, text="XML",command=self.exportxml, font=("goudy old style",15),bg="#feff97", cursor="hand2").place(x=1300,y=10,width=90,height=30)
 
 
 
@@ -233,7 +234,7 @@ class sales_statsClass:
         return rows
     
 
-    def export(self):
+    def exportpdf(self):
         # Step 1: Retrieve data from SalesTable
         print(self.filtered_rows)
         if len(self.filtered_rows) != 0:
@@ -304,12 +305,47 @@ class sales_statsClass:
                 c.showPage()
                 c.save()
                 messagebox.showinfo("Success", "Sales report has been saved as sales_report.pdf")
+    
+    def exportxml(self):
+    # Step 1: Retrieve data from SalesTable
+        if len(self.filtered_rows) != 0:
+            # Step 2: Create XML structure
+            root = ET.Element("SalesReport")
+
+            # Add sales data
+            for row in self.filtered_rows:
+                sale = ET.SubElement(root, "Sale")
+                ET.SubElement(sale, "ID").text = str(row[0])
+                ET.SubElement(sale, "Product").text = row[1]
+                ET.SubElement(sale, "Category").text = row[2]
+                ET.SubElement(sale, "Qty").text = str(row[3])
+                ET.SubElement(sale, "Total").text = str(row[4])
+                ET.SubElement(sale, "Supplier").text = row[5]
+                ET.SubElement(sale, "Date").text = row[6]
+
+            # Add total sales, income, and date generated
+            totals = ET.SubElement(root, "Totals")
+            ET.SubElement(totals, "TotalSales").text = "Total sales: " + str(len(self.filtered_rows))
+            ET.SubElement(totals, "TotalIncome").text = str(sum(float(row[4]) for row in self.filtered_rows))
+            ET.SubElement(totals, "GeneratedOn").text = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+            # Step 3: Save the XML file
+            file_path = filedialog.asksaveasfilename(defaultextension=".xml", filetypes=[("XML files", "*.xml")], title="Save Report As")
+            if file_path:
+                tree = ET.ElementTree(root)
+                tree.write(file_path)
+                messagebox.showinfo("Success", "Sales report has been saved as sales_report.xml")
+
+
+
+
+
 
                 
 
         
 
-        messagebox.showinfo("Success", f"Sales report saved successfully at {file_path}")
+        
 
 
         
