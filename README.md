@@ -1,4 +1,5 @@
 # Inventory Management System
+![image](https://github.com/user-attachments/assets/7b9e8c73-d7a7-4f93-af2c-66b0f6d195b9)
 
 ## Project Description
 
