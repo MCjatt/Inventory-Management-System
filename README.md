@@ -27,6 +27,7 @@ By leveraging Python's versatility, the system incorporates a visually appealing
 4. **User-Friendly Interface**:
    - Built with **PyQT5**, providing an intuitive and sleek GUI for smooth navigation and usability.
    - Accessible options for viewing inventory, adding new products, and managing employees.
+   - Compatible with **barcode scanners**.
 
 5. **Local Data Management**:
    - All product, sales, and employee information is securely stored in a local **SQLite** database, ensuring reliability and portability.
