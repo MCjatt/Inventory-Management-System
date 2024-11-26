@@ -3,7 +3,7 @@
 
 ## Project Description
 
-The **Inventory Management System (IMS)** is a comprehensive solution designed to streamline stock tracking, sales processing, and employee management for small to medium-sized businesses. This system integrates a user-friendly graphical interface with a powerful database backend, ensuring seamless operation and real-time updates.
+The **Inventory Management System (IMS)** is a comprehensive solution designed to streamline stock tracking, sales processing, and employee management for small to medium-sized businesses. This system integrates a user-friendly graphical interface with a powerful database backend, ensuring seamless operation and real-time updates, even compatible with barcode scanners.
 
 By leveraging Python's versatility, the system incorporates a visually appealing GUI built with **PyQT5**, while the local **SQLite** database manages the application's data storage needs. This project aims to enhance operational efficiency and provide valuable insights through advanced reporting features.
 
