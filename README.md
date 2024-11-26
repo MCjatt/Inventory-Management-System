@@ -30,6 +30,8 @@ By leveraging Python's versatility, the system incorporates a visually appealing
 
 5. **Local Data Management**:
    - All product, sales, and employee information is securely stored in a local **SQLite** database, ensuring reliability and portability.
+![image](https://github.com/user-attachments/assets/ef10a2ce-1ce4-41a1-ac07-8c1f97debba8)
+
 
 ## Technology Stack
 
